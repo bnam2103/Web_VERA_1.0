@@ -1,0 +1,283 @@
+/* =========================
+   RESET + ROOT
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at top, #101820, #05080c);
+  color: #eaeaea;
+  overflow: hidden; /* prevent page scroll */
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* =========================
+   SIDEBAR (DESKTOP / TABLET)
+========================= */
+
+.sidebar {
+  width: 32%;
+  min-width: 300px;
+  max-width: 420px;
+
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  background: rgba(255,255,255,0.04);
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  background: rgba(255,255,255,0.05);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.sidebar p,
+.sidebar li {
+  font-size: 14px;
+  color: #cfd8df;
+}
+
+/* =========================
+   FEEDBACK
+========================= */
+
+.feedback-hint {
+  font-size: 13px;
+  color: #9aa4ad;
+  margin-bottom: 8px;
+}
+
+#feedback-input {
+  width: 100%;
+  resize: none;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  background: rgba(255,255,255,0.08);
+  color: #eaeaea;
+}
+
+#feedback-input::placeholder {
+  color: #8a949d;
+}
+
+#send-feedback {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #2f3a44;
+  color: #eaeaea;
+}
+
+#send-feedback:hover {
+  background: #3b4853;
+}
+
+.feedback-status {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #5cffb1;
+}
+
+/* =========================
+   SERVER STATUS
+========================= */
+
+.server-status {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.server-status.online  { color: #5cffb1; }
+.server-status.offline { color: #ff6b6b; }
+
+.status-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #9aa4ad;
+}
+
+/* =========================
+   CHAT PANEL
+========================= */
+
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.02);
+}
+
+/* =========================
+   CHAT LOG
+========================= */
+
+.conversation {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Chat bubbles */
+
+.bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.bubble.user {
+  align-self: flex-start;
+  background: #1e2a36;
+}
+
+.bubble.vera {
+  align-self: flex-end;
+  background: #2f3a44;
+  color: #f1f5f7;
+}
+
+/* =========================
+   INPUT BAR
+========================= */
+
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.15);
+}
+
+#record {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #0f1a22;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.status {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.recording { color: #ff6b6b; }
+.thinking  { color: #ffb347; }
+.speaking  { color: #5cffb1; }
+.idle      { color: #aaa; }
+
+/* =========================
+   LARGE SCREENS (27"+)
+========================= */
+
+@media (min-width: 1600px) {
+  .sidebar {
+    width: 420px;
+  }
+
+  .conversation {
+    padding: 28px;
+  }
+
+  .bubble {
+    font-size: 15px;
+  }
+}
+
+/* =========================
+   MOBILE-ONLY SERVER STATUS
+========================= */
+
+/* Default: hide mobile status */
+.mobile-only {
+  display: none;
+}
+
+/* PHONE VIEW */
+@media (max-width: 768px) {
+
+  /* Hide sidebar */
+  .sidebar {
+    display: none;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .mobile-only {
+    display: inline;
+  }
+
+  /* ⬆️ LIFT INPUT BAR ABOVE SYSTEM NAV BAR */
+  .input-bar {
+    justify-content: space-between;
+    gap: 12px;
+
+    padding-bottom: calc(
+      14px + env(safe-area-inset-bottom)
+    );
+
+    /* Optional but recommended */
+    position: sticky;
+    bottom: 0;
+  }
+
+  .status {
+    font-size: 14px;
+  }
+
+  .server-status {
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: auto;
+    padding-left: 12px;
+  }
+}

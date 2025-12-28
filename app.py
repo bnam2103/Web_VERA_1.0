@@ -34,7 +34,7 @@ MIN_AUDIO_BYTES = 1500
 MIN_AUDIO_RMS = 0.015  # 🔑 ENERGY GATE (MATCHES FRONTEND)
 MIN_VOICED_SECONDS = 0.05   # 🔑 NEW
 ZCR_MIN = 0.01
-ZCR_MAX = 0.35             # 🔑 NEW
+ZCR_MAX = 0.35            # 🔑 NEW (TUNER; fast speech fails with lower number)
 
 MAX_FEEDBACK_BYTES = 1 * 1024 * 1024  # 1 MB
 
@@ -204,7 +204,12 @@ async def infer(
 
     seg = seg.set_channels(1).set_frame_rate(TARGET_SR)
 
-    samples = np.array(seg.get_array_of_samples(), dtype=np.float32) / 32768.0
+    samples = np.array(seg.get_array_of_samples(), dtype=np.float32)
+
+    # robust normalization (always correct)
+    peak = np.max(np.abs(samples))
+    if peak > 0:
+        samples /= peak
 
     # =========================
     # 🔑 ENERGY GATE (BEFORE NORMALIZATION)

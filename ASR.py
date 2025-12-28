@@ -149,20 +149,55 @@ def transcribe_long(audio_np):
     chunks = chunk_audio(audio_np)
 
     texts = []
-    for i, chunk in enumerate(chunks):
-        # print(f"Transcribing chunk {i+1}/{len(chunks)}")
+    logprobs = []
 
-        inputs = processor(chunk, sampling_rate=SAMPLE_RATE, return_tensors="pt")
+    for chunk in chunks:
+        inputs = processor(
+            chunk,
+            sampling_rate=SAMPLE_RATE,
+            return_tensors="pt"
+        )
         input_features = inputs.input_features.to(device)
 
         with torch.no_grad():
-            predicted_ids = model.generate(input_features)
+            outputs = model.generate(
+                input_features,
+                return_dict_in_generate=True,
+                output_scores=True
+            )
 
-        text = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
-        # print(text) # Debugging
+        # Decode text
+        text = processor.batch_decode(
+            outputs.sequences,
+            skip_special_tokens=True
+        )[0].strip()
+
+        if not text:
+            continue
+
+        # ----- Confidence calculation -----
+        scores = outputs.scores
+        tokens = outputs.sequences[0][1:]  # skip BOS
+
+        token_logprobs = []
+        for step_scores, token_id in zip(scores, tokens):
+            logprob = torch.log_softmax(step_scores[0], dim=-1)[token_id]
+            token_logprobs.append(logprob.item())
+
+        if token_logprobs:
+            avg_logprob = sum(token_logprobs) / len(token_logprobs)
+            logprobs.append(avg_logprob)
+
         texts.append(text)
 
-    return " ".join(texts)
+    if not texts or not logprobs:
+        return "", -10.0  # guaranteed reject
+
+    final_text = " ".join(texts).strip()
+    final_confidence = sum(logprobs) / len(logprobs)
+
+    return final_text, final_confidence
+
 
 # Default transcribe function
 def transcribe(audio_np):

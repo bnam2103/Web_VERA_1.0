@@ -118,9 +118,9 @@ def detect_intent(text: str) -> str | None:
         str.maketrans("", "", string.punctuation)
     )
 
-    if any(k in cleaned for k in ["time", "clock"]):
+    if any(k in cleaned for k in ["current time"]):
         return "time"
-    if any(k in cleaned for k in ["date", "day", "today"]):
+    if any(k in cleaned for k in ["current date"]):
         return "date"
 
     return None
@@ -246,7 +246,13 @@ async def infer(
     # =========================
 
     async with asr_lock:
-        transcript = transcribe_long(samples).strip()
+        transcript, confidence = transcribe_long(samples)
+
+        print(f"[ASR] conf={confidence:.3f} text=\"{transcript}\"")
+
+        if confidence < -0.5: #(TUNER)
+            print("[ASR] Dropped low-confidence transcription")
+            return {"skip": True}
 
     if not transcript:
         return {"skip": True}

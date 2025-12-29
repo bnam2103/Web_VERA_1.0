@@ -114,15 +114,15 @@ def check_date():
     return f"Today's date is {datetime.now().strftime('%A, %B %d, %Y')}."
 
 def detect_intent(text: str, history) -> str | None:
-    cleaned = text.lower().translate(
-        str.maketrans("", "", string.punctuation)
-    )
-    messages = build_messages(history, cleaned)
+    # cleaned = text.lower().translate(
+    #     str.maketrans("", "", string.punctuation)
+    # )
+    messages = build_messages(history, text)
     reply = vera.generate(messages).strip()
 
-    if any(k in reply for k in ["current time", "realtime", "real time"]):
+    if any(k in reply for k in ["current time", "realtime", "real time","real-time"]):
         return "time"
-    if any(k in reply for k in ["current date"]):
+    if any(k in reply for k in ["current date", "current year", "current month"]):
         return "date"
     return None
 
